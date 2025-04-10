@@ -172,7 +172,7 @@ int main()
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
 
 	//models
-	Model Dog((char*)"Models/texturasPF/LAB.obj");
+	Model Dog((char*)"Models/LAB.obj");
 	/*Model func((char*)"Models/texturasPF/GENFUN1.obj");
 	Model Piso((char*)"Models/texturasPF/SILLAS.obj");
 	Model Dog((char*)"Models/texturasPF/LAB.obj");
