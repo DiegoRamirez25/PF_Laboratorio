@@ -1,5 +1,8 @@
 /*
-Proyecto Final
+Prática 10
+Ramírez Moreno Diego Gerardo
+319296738
+06 de marzo del 2025
 */
 #include <iostream>
 #include <cmath>
@@ -122,7 +125,7 @@ int main()
 {
 	// Inicialización de GLFW
 	glfwInit();
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Proyecto Final | Equipo 8", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Animacion basica | Diego Ramirez | 319296738", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
 	glewExperimental = GL_TRUE;
@@ -172,27 +175,25 @@ int main()
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
 
 	//models
-	Model Dog((char*)"Models/LAB.obj");
-	/*Model func((char*)"Models/texturasPF/GENFUN1.obj");
-	Model Piso((char*)"Models/texturasPF/SILLAS.obj");
-	Model Dog((char*)"Models/texturasPF/LAB.obj");
-	Model mesas((char*)"Models/texturasPF/MESAS.obj");
-	Model cables((char*)"Models/texturasPF/CONECTORES1.obj");
-	Model gabinete1((char*)"Models/texturasPF/GABINETES1.obj");
-	Model perif((char*)"Models/texturasPF/PERIFERICOS.obj");
-	Model compus((char*)"Models/texturasPF/COMPUS.obj");
-	Model mult((char*)"Models/texturasPF/MULT1.obj");
-	Model ventanas((char*)"Models/texturasPF/VENTANAS.obj");
-	Model perif2((char*)"Models/texturasPF/PERIFERICOS2.obj");
-	Model perif3((char*)"Models/texturasPF/PERIFERICOS3.obj");
-	Model perif4((char*)"Models/texturasPF/PERIFERICOS4.obj");
-	Model gabinete2((char*)"Models/texturasPF/GABINETES2.obj");
-	Model gabinete3((char*)"Models/texturasPF/GABINETES3.obj");
-	Model gabinete4((char*)"Models/texturasPF/GABINETES4.obj");
-	Model cables2((char*)"Models/texturasPF/CONECTORES2.obj");
-	Model cables3((char*)"Models/texturasPF/CONECTORES3.obj");
-	Model cables4((char*)"Models/texturasPF/CONECTORES4.obj");
-	Model medicion((char*)"Models/texturasPF/MEDICION.obj");*/
+	Model lab((char*)"Models/LAB.obj");
+	Model mesas((char*)"Models/MESAS.obj");
+	Model cables((char*)"Models/CABLES.obj");
+	Model cables2((char*)"Models/CABLES2.obj");
+	Model cables3((char*)"Models/CABLES3.obj");
+	Model monitores((char*)"Models/MONITORES.obj");
+	Model perif((char*)"Models/PERIFERICOS.obj");
+	Model perif2((char*)"Models/PERIFERICOS2.obj");
+	Model perif3((char*)"Models/PERIFERICOS3.obj");
+	Model perif4((char*)"Models/PERIFERICOS4.obj");
+	Model gabinete1((char*)"Models/GABINETES.obj");
+	Model gabinete2((char*)"Models/GABINETES2.obj");
+	Model gabinete3((char*)"Models//GABINETES3.obj");
+	Model gabinete4((char*)"Models/GABINETES4.obj");
+	Model medicion((char*)"Models/MEDICION.obj");
+	Model medicion2((char*)"Models/MEDICION2.obj");
+	Model medicion3((char*)"Models/MEDICION3.obj");
+	Model medicion4((char*)"Models/MEDICION4.obj");
+
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -309,40 +310,21 @@ int main()
 
 
 		//Carga de modelo 
-		/*view = camera.GetViewMatrix();
-		model = glm::mat4(1);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Piso.Draw(lightingShader);*/
-
+		//-------------  BUENOS  ---------------
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Dog.Draw(lightingShader);
+		lab.Draw(lightingShader);
 
-		/*model = glm::mat4(1);
+		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		mesas.Draw(lightingShader);*/
+		mesas.Draw(lightingShader);
 
-		////model = glm::mat4(1);
-		////glEnable(GL_BLEND); // Activa la funcionalidad para trabajar el canal alfa
-		////glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		////model = glm::translate(model, glm::vec3(0.0f, ballPosY, 0.0f)); // Movimiento vertical
-		////glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		////glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
-		////Ball.Draw(lightingShader);
-		////glDisable(GL_BLEND);  // Desactiva el canal alfa
-
-		/*model = glm::mat4(1);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		ventanas.Draw(lightingShader);*/
-
-		/*model = glm::mat4(1);
+		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		cables.Draw(lightingShader);
-		glBindVertexArray(0);
 
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -357,12 +339,7 @@ int main()
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		cables4.Draw(lightingShader);
-
-		model = glm::mat4(1);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		compus.Draw(lightingShader);
+		monitores.Draw(lightingShader);
 
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -407,7 +384,24 @@ int main()
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		medicion.Draw(lightingShader);*/
+		medicion.Draw(lightingShader);
+
+		model = glm::mat4(1);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		medicion2.Draw(lightingShader);
+
+		model = glm::mat4(1);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		medicion3.Draw(lightingShader);
+
+		model = glm::mat4(1);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		medicion4.Draw(lightingShader);
+
+
 
 		glBindVertexArray(0);
 		// Also draw the lamp object, again binding the appropriate shader
