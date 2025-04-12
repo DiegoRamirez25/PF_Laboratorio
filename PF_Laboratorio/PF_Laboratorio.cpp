@@ -1,9 +1,4 @@
-/*
-Prática 10
-Ramírez Moreno Diego Gerardo
-319296738
-06 de marzo del 2025
-*/
+
 #include <iostream>
 #include <cmath>
 
