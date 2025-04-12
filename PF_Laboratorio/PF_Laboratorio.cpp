@@ -175,25 +175,26 @@ int main()
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
 
 	//models
-	Model lab((char*)"Models/LAB.obj");
-	Model mesas((char*)"Models/MESAS.obj");
-	Model cables((char*)"Models/CABLES.obj");
-	Model cables2((char*)"Models/CABLES2.obj");
-	Model cables3((char*)"Models/CABLES3.obj");
-	Model monitores((char*)"Models/MONITORES.obj");
-	Model perif((char*)"Models/PERIFERICOS.obj");
-	Model perif2((char*)"Models/PERIFERICOS2.obj");
-	Model perif3((char*)"Models/PERIFERICOS3.obj");
-	Model perif4((char*)"Models/PERIFERICOS4.obj");
-	Model gabinete1((char*)"Models/GABINETES.obj");
-	Model gabinete2((char*)"Models/GABINETES2.obj");
-	Model gabinete3((char*)"Models//GABINETES3.obj");
-	Model gabinete4((char*)"Models/GABINETES4.obj");
 	Model medicion((char*)"Models/MEDICION.obj");
 	Model medicion2((char*)"Models/MEDICION2.obj");
 	Model medicion3((char*)"Models/MEDICION3.obj");
 	Model medicion4((char*)"Models/MEDICION4.obj");
-
+	Model mesas((char*)"Models/MESAS.obj");
+	Model monitores((char*)"Models/MONITORES.obj");
+	Model cables((char*)"Models/CABLES.obj");
+	Model cables2((char*)"Models/CABLES2.obj");
+	Model cables3((char*)"Models/CABLES3.obj");
+	Model lab((char*)"Models/LAB.obj");
+	Model sillas((char*)"Models/SILLAS.obj");
+	Model mouse((char*)"Models/MOUSES.obj");
+	Model mouse2((char*)"Models/MOUSES2.obj");
+	Model mouse3((char*)"Models/MOUSES3.obj");
+	Model teclado((char*)"Models/TECLADOS.obj");
+	Model teclado2((char*)"Models/TECLADOS2.obj");
+	Model teclado3((char*)"Models/TECLADOS3.obj");
+	Model gabinete((char*)"Models/GABINETES.obj");
+	Model gabinete2((char*)"Models/GABINETES2.obj");
+	Model gabinete3((char*)"Models//GABINETES3.obj");
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -324,6 +325,11 @@ int main()
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		sillas.Draw(lightingShader);
+
+		model = glm::mat4(1);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		cables.Draw(lightingShader);
 
 		model = glm::mat4(1);
@@ -344,27 +350,37 @@ int main()
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		perif.Draw(lightingShader);
+		mouse.Draw(lightingShader);
 
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		perif2.Draw(lightingShader);
+		mouse2.Draw(lightingShader);
 
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		perif3.Draw(lightingShader);
+		mouse3.Draw(lightingShader);
 
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		perif4.Draw(lightingShader);
+		teclado.Draw(lightingShader);
 
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		gabinete1.Draw(lightingShader);
+		teclado2.Draw(lightingShader);
+
+		model = glm::mat4(1);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		teclado3.Draw(lightingShader);
+
+		model = glm::mat4(1);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		gabinete.Draw(lightingShader);
 
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -375,11 +391,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		gabinete3.Draw(lightingShader);
-
-		model = glm::mat4(1);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		gabinete4.Draw(lightingShader);
 
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
