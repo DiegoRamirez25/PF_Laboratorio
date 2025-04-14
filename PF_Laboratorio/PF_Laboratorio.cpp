@@ -170,7 +170,7 @@ int main()
 
 	// =-=-=- LAB ACTUAL =-=-=-
 
-	/*Model lab((char*)"Models/LAB.obj");
+	Model lab((char*)"Models/LAB.obj");
 	Model medicion((char*)"Models/MEDICION.obj");
 	Model medicion2((char*)"Models/MEDICION2.obj");
 	Model medicion3((char*)"Models/MEDICION3.obj");
@@ -189,8 +189,8 @@ int main()
 	Model teclado3((char*)"Models/TECLADOS3.obj");
 	Model gabinete((char*)"Models/GABINETES.obj");
 	Model gabinete2((char*)"Models/GABINETES2.obj");
-	Model gabinete3((char*)"Models//GABINETES3.obj");*/
-	
+	Model gabinete3((char*)"Models//GABINETES3.obj");
+
 
 	// =-=-=- LAB NUEVO =-=-=-+
 
@@ -335,7 +335,7 @@ int main()
 		//Carga de modelo 
 		// =-=-=- LAB ACTUAL =-=-=-
 
-		/*model = glm::mat4(1);
+		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		lab.Draw(lightingShader);
@@ -433,8 +433,8 @@ int main()
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		medicion4.Draw(lightingShader);*/
-	
+		medicion4.Draw(lightingShader);
+
 
 
 		// =-=-=- LAB NUEVO =-=-=-
@@ -503,7 +503,7 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		tecladoLN.Draw(lightingShader);
-		
+
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -553,6 +553,7 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		sillasLN.Draw(lightingShader);
+
 		glBindVertexArray(0);
 		// Also draw the lamp object, again binding the appropriate shader
 		lampShader.Use();
