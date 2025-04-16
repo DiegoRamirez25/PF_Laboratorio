@@ -57,13 +57,53 @@ bool firstMouse = true;
 // Light attributes
 glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
 bool active;
+bool recorridoActivo = false;
+bool recorridoActivo2 = false;
+
 
 // Positions of the point lights
 glm::vec3 pointLightPositions[] = {
-	glm::vec3(0.0f,2.0f, 0.0f),
-	glm::vec3(0.0f,0.0f, 0.0f),
-	glm::vec3(0.0f,0.0f,  0.0f),
-	glm::vec3(0.0f,0.0f, 0.0f)
+	glm::vec3(2.656f, 14.766f, 14.766f),//Luces calidas
+	glm::vec3(2.656f, 14.766f,  -5.8f),
+	glm::vec3(2.656f, 14.766f, -10.766f),
+	glm::vec3(16.73f, 14.766f, 19.53f),
+	glm::vec3(16.73f, 14.766f, 14.977f),
+	glm::vec3(16.73f, 14.766f,  -5.52f),
+	glm::vec3(16.73f, 14.766f, -10.073f),
+	glm::vec3(31.739f, 14.766f, 19.53f),
+	glm::vec3(31.739f, 14.766f, 14.977f),
+	glm::vec3(31.739f, 14.766f,  -5.52f),
+	glm::vec3(31.739f, 14.766f, -10.073f),
+	glm::vec3(-110.29f, 20.968f,  27.641f),
+	glm::vec3(-110.29f, 20.968f,  17.237f),
+	glm::vec3(-110.29f, 20.968f,  2.35f),
+	glm::vec3(-110.29f, 20.968f,  -8.04f),
+	glm::vec3(-92.84f, 20.637f,  26.4f),
+	glm::vec3(-92.84f, 20.637f,  16.01f),
+	glm::vec3(-92.84f, 20.637f,  1.14f),
+	glm::vec3(-92.84f, 20.637f,  -7.3f),
+	glm::vec3(-77.46f, 20.637f,  26.4f),
+	glm::vec3(-77.46f, 20.637f,  16.01f),
+	glm::vec3(-77.46f, 20.637f,  1.14f),
+	glm::vec3(-77.46f, 20.637f,   -7.3f),
+	glm::vec3(-78.15f, 4.17f,   23.96f),
+	glm::vec3(-89.26f, 4.17f,   23.96f),
+	glm::vec3(-100.7f, 4.17f,   23.96f),
+	glm::vec3(-78.15f, 4.17f,   6.25f),
+	glm::vec3(-89.26f, 4.17f,   6.25f),
+	glm::vec3(-100.7f, 4.17f,   6.25f),
+	glm::vec3(-78.15f, 4.17f,   -9.24f),
+	glm::vec3(-89.26f, 4.17f,   -9.24f),
+	glm::vec3(-100.7f, 4.17f,   -9.24f),
+	glm::vec3(28.66f, 7.83f, 20.44f),//Luces azules
+	glm::vec3(18.56f, 7.83f, 10.68f),
+	glm::vec3(18.56f, 7.83f, 0.97f),
+	glm::vec3(7.75f, 7.83f,  -8.92f),
+	glm::vec3(-120.39f, 14.24f,  3.16f),
+	glm::vec3(-100.8f, 10.843f,  11.90f),
+	glm::vec3(-100.8f, 10.843f,  0.52f),
+	glm::vec3(-89.69f, 10.677f,  24.90f),
+	glm::vec3(-78.28f, 10.843f,  11.958f)
 };
 
 float vertices[] = {
@@ -168,7 +208,7 @@ int main()
 	Shader lightingShader("Shader/lighting.vs", "Shader/lighting.frag");
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
 
-	// =-=-=- LAB ACTUAL =-=-=-
+	 //=-=-=- LAB ACTUAL =-=-=-
 
 	Model lab((char*)"Models/LAB.obj");
 	Model medicion((char*)"Models/MEDICION.obj");
@@ -248,6 +288,14 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		glm::mat4 lightProjection, lightView;
+		glm::mat4 lightSpaceMatrix;
+
+		float near_plane = 1.0f, far_plane = 50.0f;
+		lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, near_plane, far_plane);
+		lightView = glm::lookAt(glm::vec3(20.0f, 20.0f, 20.0f), glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		lightSpaceMatrix = lightProjection * lightView;
+
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 		DoMovement();
@@ -259,11 +307,6 @@ int main()
 
 		// OpenGL options
 		glEnable(GL_DEPTH_TEST);
-
-
-
-
-
 
 		// Use cooresponding shader when setting uniforms/drawing objects
 		lightingShader.Use();
@@ -289,30 +332,87 @@ int main()
 		lightColor.z = sin(glfwGetTime() * Light1.z);
 
 
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].position"), pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"), lightColor.x, lightColor.y, lightColor.z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse"), lightColor.x, lightColor.y, lightColor.z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular"), 1.0f, 0.2f, 0.2f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), 1.0f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.045f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.075f);
+		// ===---===---=== LUCES DE TECHO Y MONITORES CON ANIMACIÓN EN MONITORES ---===---===---===
+		for (int i = 0; i < 41; i++) {
+			std::string idx = std::to_string(i);
+			std::string base = "pointLights[" + idx + "].";
+
+			glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "position").c_str()),
+				pointLightPositions[i].x, pointLightPositions[i].y, pointLightPositions[i].z);
+
+			if (i <= 10) {
+				// Luces cálidas del techo
+				glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "ambient").c_str()), 0.05f, 0.04f, 0.03f);
+				glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "diffuse").c_str()), 0.2f, 0.18f, 0.15f);
+				glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "specular").c_str()), 0.3f, 0.25f, 0.2f);
+			}
+			else if (i >= 11 && i <= 32) {
+				// Luces blancas (laboratorio, escritorios)
+				glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "ambient").c_str()), 0.1f, 0.1f, 0.1f);
+				glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "diffuse").c_str()), 0.8f, 0.8f, 0.8f);
+				glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "specular").c_str()), 0.9f, 0.9f, 0.9f);
+			}
+			else {
+				// Luces azules animadas (monitores)
+				float t = glfwGetTime();
+				float flicker = abs(sin(t * 2.0f + i)); // Desfase con el índice
+
+				glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "ambient").c_str()), 0.01f, 0.01f, 0.05f);
+				glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "diffuse").c_str()), 0.4f * flicker, 0.4f * flicker, 1.0f * flicker);
+				glUniform3f(glGetUniformLocation(lightingShader.Program, (base + "specular").c_str()), 0.5f * flicker, 0.5f * flicker, 1.0f * flicker);
+			}
+
+			// Atenuación común
+			glUniform1f(glGetUniformLocation(lightingShader.Program, (base + "constant").c_str()), 1.0f);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, (base + "linear").c_str()), 0.14f);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, (base + "quadratic").c_str()), 0.07f);
+		}
 
 
-		// SpotLight
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLight.position"), camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLight.direction"), camera.GetFront().x, camera.GetFront().y, camera.GetFront().z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLight.ambient"), 0.2f, 0.2f, 0.8f);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLight.diffuse"), 0.2f, 0.2f, 0.8f);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLight.specular"), 0.0f, 0.0f, 0.0f);
+		// Spotlight - Luz azul del proyector al pizarrón
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLight.position"), 15.176f, 4.2527f, 12.95f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLight.direction"), 0.0f, -0.391f, -0.9204f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLight.cutOff"), glm::cos(glm::radians(9.0f)));
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLight.outerCutOff"), glm::cos(glm::radians(13.0f)));
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLight.ambient"), 0.01f, 0.01f, 0.05f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLight.diffuse"), 0.0f, 0.0f, 1.0f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLight.specular"), 0.3f, 0.3f, 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLight.constant"), 1.0f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLight.linear"), 0.3f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLight.quadratic"), 0.7f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLight.cutOff"), glm::cos(glm::radians(12.0f)));
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLight.outerCutOff"), glm::cos(glm::radians(18.0f)));
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLight.linear"), 0.09f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLight.quadratic"), 0.032f);
 
 
 		// Set material properties
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"), 5.0f);
+
+		// ---===---===--- RECORRIDO LAB VIEJO ===---===---===
+
+		if (recorridoActivo) {
+			float t = glfwGetTime();
+			float radius = 18.0f;
+			float centerX = 20.0f;
+			float centerZ = 6.35f;
+
+			float camX = sin(t * 0.3f) * radius + centerX;
+			float camZ = cos(t * 0.3f) * radius + centerZ;
+
+			camera.SetPosition(glm::vec3(camX, 12.0f, camZ));
+			camera.SetFront(glm::normalize(glm::vec3(centerX - camX, -0.5f, centerZ - camZ)));
+		}
+
+		if (recorridoActivo2) {
+			float t = glfwGetTime();
+			float radius = 26.0f;
+			float centerX = -93.68f;
+			float centerZ = 13.145f;
+
+			float camX = sin(t * 0.3f) * radius + centerX;
+			float camZ = cos(t * 0.3f) * radius + centerZ;
+
+			camera.SetPosition(glm::vec3(camX, 13.0f, camZ));  // Altura un poco mayor
+			camera.SetFront(glm::normalize(glm::vec3(centerX - camX, -0.5f, centerZ - camZ)));
+		}
+
 
 		// Create camera transformations
 		glm::mat4 view;
@@ -598,6 +698,7 @@ int main()
 // Moves/alters the camera positions based on user input
 void DoMovement()
 {
+	if (recorridoActivo) return;
 
 	// Camera controls
 	if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
@@ -653,7 +754,6 @@ void DoMovement()
 	{
 		pointLightPositions[0].z += 0.01f;
 	}
-
 }
 
 // Is called whenever a key is pressed/released via GLFW
@@ -689,11 +789,16 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 			Light1 = glm::vec3(0);//Cuado es solo un valor en los 3 vectores pueden dejar solo una componente
 		}
 	}
-	if (keys[GLFW_KEY_N])
-	{
-		AnimBall = !AnimBall;
 
+	if (key == GLFW_KEY_R && action == GLFW_PRESS) {
+		recorridoActivo = !recorridoActivo;
 	}
+
+	if (key == GLFW_KEY_T && action == GLFW_PRESS) {
+		recorridoActivo2 = !recorridoActivo2;
+		recorridoActivo = false;  // Desactiva el otro recorrido si está activo
+	}
+
 }
 // Función de animación vertical
 void Animation() {
@@ -728,3 +833,6 @@ void MouseCallback(GLFWwindow* window, double xPos, double yPos)
 
 	camera.ProcessMouseMovement(xOffset, yOffset);
 }
+
+
+
