@@ -1,4 +1,11 @@
-
+/*
+PROYECTO FINAL
+COMPUTACION GRAFICA
+EQUIPO 8
+317290967
+319296738
+319281998
+*/
 #include <iostream>
 #include <cmath>
 
@@ -310,7 +317,7 @@ int main()
 {
 	// Inicialización de GLFW
 	glfwInit();
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Animacion basica | Diego Ramirez | 319296738", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Proyecto Final | Equipo 8", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
 	glewExperimental = GL_TRUE;
