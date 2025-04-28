@@ -1150,10 +1150,6 @@ void DoMovement()
 
 	}
 
-	if (keys[GLFW_KEY_T])
-	{
-		pointLightPositions[0].x += 0.01f;
-	}
 	if (keys[GLFW_KEY_G])
 	{
 		pointLightPositions[0].x -= 0.01f;
