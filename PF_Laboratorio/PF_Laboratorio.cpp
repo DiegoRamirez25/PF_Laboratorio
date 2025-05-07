@@ -50,6 +50,7 @@ void renderBall(Shader& shader, Model& Ball) {
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
+void Animation();
 void cargarKeyframesSillas(std::string archivoEntrada, std::string archivoSalida);
 void dibujarParteAnimada(Model& parte, float desfase, GLint modelLoc, Shader& shader);
 
@@ -307,6 +308,23 @@ void prepararKeyframesGabinetes() {
 	}
 }
 
+//================ ANIMACION ESTUDIANTE ======================
+int StuAnim = 0;
+float FLegs = 0.0f;
+float RLegs = 0.0f;
+glm::vec3 StuPos(-4.528f, 5.608f, -35.127f); // X, Z, Y de Blender → X, Y, Z en OpenGL
+float StuRot = 0.0f;
+bool step = false;
+
+// Variables de animación
+bool moveForward = false;   // Tecla 1: Mover hacia adelante
+bool turnRight = false;     // Tecla 2: Girar 90 grados a la derecha
+bool turnLeft = false;      // Tecla 3: Girar 90 grados a la izquierda
+bool turn180 = false;       // Tecla 4: Girar 180 grados
+bool moveBackward = false;
+// Variables de control para rotaciones
+float targetRotation = 0.0f;  // Rotación objetivo
+
 float vertices[] = {
 	 -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 		0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -425,9 +443,9 @@ int main()
 	//Model medicion3((char*)"Models/MEDICION3.obj");
 	//Model medicion4((char*)"Models/MEDICION4.obj");
 	//Model mesas((char*)"Models/MESAS.obj");
-	Model sillas((char*)"Models/SILLAS.obj");
+	/*Model sillas((char*)"Models/SILLAS.obj");
 	Model sillas2((char*)"Models/SILLAS2.obj");
-	Model sillas3((char*)"Models/SILLAS3.obj");
+	Model sillas3((char*)"Models/SILLAS3.obj");*/
 	//Model monitores((char*)"Models/MONITORES.obj");
 	//Model cables((char*)"Models/CABLES.obj");
 	//Model cables2((char*)"Models/CABLES2.obj");
@@ -441,7 +459,9 @@ int main()
 	//Model gabinete((char*)"Models/GABINETES.obj");
 	//Model gabinete2((char*)"Models/GABINETES2.obj");
 	//Model gabinete3((char*)"Models//GABINETES3.obj");
-
+	Model StuBody((char*)"Models/student/StudentBody.obj");
+	Model F_RightLeg((char*)"Models/student/RightLeg.obj");
+	Model F_LeftLeg((char*)"Models/student/LeftLeg.obj");
 	////// =-=-=- LAB NUEVO =-=-=-+
 
 	/*Model labN((char*)"Models/LABN.obj");
@@ -463,10 +483,10 @@ int main()
 	Model cablesLN((char*)"Models/CABLES_LN.obj");
 	Model cablesLN2((char*)"Models/CABLES_LN2.obj");
 	Model cablesLN3((char*)"Models/CABLES_LN3.obj");*/
-	Model sillasLN((char*)"Models/SILLAS_LN.obj");
-	Model sillasLN2((char*)"Models/SILLAS_LN2.obj");
-	Model sillasLN3((char*)"Models/SILLAS_LN3.obj");
-	Model gabinetesLN1((char*)"Models/GABINETES_LN.obj");
+	//Model sillasLN((char*)"Models/SILLAS_LN.obj");
+	//Model sillasLN2((char*)"Models/SILLAS_LN2.obj");
+	//Model sillasLN3((char*)"Models/SILLAS_LN3.obj");
+	/*Model gabinetesLN1((char*)"Models/GABINETES_LN.obj");
 	Model gabinetesLN2((char*)"Models/GABINETES_LN2.obj");
 	Model gabinetesLN3((char*)"Models/GABINETES_LN3.obj");
 	Model gabinetesLN4((char*)"Models/GABINETES_LN4.obj");
@@ -483,7 +503,7 @@ int main()
 		&gabinetesLN1, &gabinetesLN2, &gabinetesLN3, &gabinetesLN4,
 		&gabinetesLN5, &gabinetesLN6, &gabinetesLN7, &gabinetesLN8,
 		&gabinetesLN9, &gabinetesLN10, &gabinetesLN11, &gabinetesLN12
-	};
+	};*/
 
 	prepararKeyframesRemolino();
 	prepararKeyframesGabinetes();
@@ -521,6 +541,8 @@ int main()
 		glm::mat4 lightProjection, lightView;
 		glm::mat4 lightSpaceMatrix;
 
+		glm::mat4 modelTemp = glm::mat4(1.0f); //Temp
+
 		float near_plane = 1.0f, far_plane = 50.0f;
 		lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, near_plane, far_plane);
 		lightView = glm::lookAt(glm::vec3(20.0f, 20.0f, 20.0f), glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
@@ -529,6 +551,8 @@ int main()
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 		DoMovement();
+		Animation();
+
 
 		if (animarSillasViejas1) {
 			delayRemolino1++;
@@ -922,55 +946,55 @@ int main()
 
 		// Sillas Viejas 1
 		// === SILLAS VIEJAS 1 ===
-		if (animarSillasViejas1 && frameSillasViejas1 < keyframesRemolino.size()) {
-			FrameRemolino kf = keyframesRemolino[frameSillasViejas1];
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, kf.posicion);
-			model = glm::rotate(model, kf.rotacionY, glm::vec3(0, 1, 0));
-			model = glm::scale(model, glm::vec3(kf.escala));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			sillas.Draw(lightingShader);
-		}
-		else if (!animarSillasViejas1) {
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Posición base
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			sillas.Draw(lightingShader);
-		}
+		//if (animarSillasViejas1 && frameSillasViejas1 < keyframesRemolino.size()) {
+		//	FrameRemolino kf = keyframesRemolino[frameSillasViejas1];
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, kf.posicion);
+		//	model = glm::rotate(model, kf.rotacionY, glm::vec3(0, 1, 0));
+		//	model = glm::scale(model, glm::vec3(kf.escala));
+		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//	sillas.Draw(lightingShader);
+		//}
+		//else if (!animarSillasViejas1) {
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Posición base
+		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//	sillas.Draw(lightingShader);
+		//}
 
-		// === SILLAS VIEJAS 2 ===
-		if (animarSillasViejas2 && frameSillasViejas2 < keyframesRemolino.size()) {
-			FrameRemolino kf = keyframesRemolino[frameSillasViejas2];
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, kf.posicion);
-			model = glm::rotate(model, kf.rotacionY, glm::vec3(0, 1, 0));
-			model = glm::scale(model, glm::vec3(kf.escala));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			sillas2.Draw(lightingShader);
-		}
-		else if (!animarSillasViejas2) {
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Posición base
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			sillas2.Draw(lightingShader);
-		}
+		//// === SILLAS VIEJAS 2 ===
+		//if (animarSillasViejas2 && frameSillasViejas2 < keyframesRemolino.size()) {
+		//	FrameRemolino kf = keyframesRemolino[frameSillasViejas2];
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, kf.posicion);
+		//	model = glm::rotate(model, kf.rotacionY, glm::vec3(0, 1, 0));
+		//	model = glm::scale(model, glm::vec3(kf.escala));
+		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//	sillas2.Draw(lightingShader);
+		//}
+		//else if (!animarSillasViejas2) {
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Posición base
+		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//	sillas2.Draw(lightingShader);
+		//}
 
-		// === SILLAS VIEJAS 3 ===
-		if (animarSillasViejas3 && frameSillasViejas3 < keyframesRemolino.size()) {
-			FrameRemolino kf = keyframesRemolino[frameSillasViejas3];
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, kf.posicion);
-			model = glm::rotate(model, kf.rotacionY, glm::vec3(0, 1, 0));
-			model = glm::scale(model, glm::vec3(kf.escala));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			sillas3.Draw(lightingShader);
-		}
-		else if (!animarSillasViejas3) {
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Posición base
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			sillas3.Draw(lightingShader);
-		}
+		//// === SILLAS VIEJAS 3 ===
+		//if (animarSillasViejas3 && frameSillasViejas3 < keyframesRemolino.size()) {
+		//	FrameRemolino kf = keyframesRemolino[frameSillasViejas3];
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, kf.posicion);
+		//	model = glm::rotate(model, kf.rotacionY, glm::vec3(0, 1, 0));
+		//	model = glm::scale(model, glm::vec3(kf.escala));
+		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//	sillas3.Draw(lightingShader);
+		//}
+		//else if (!animarSillasViejas3) {
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Posición base
+		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//	sillas3.Draw(lightingShader);
+		//}
 
 		////// =-=-=- LAB NUEVO =-=-=-
 
@@ -1089,79 +1113,100 @@ int main()
 		//cablesLN3.Draw(lightingShader);
 
 		//=== SILLAS NUEVAS 1 ===
-		if (animarSillasNuevas1 && frameSillasNuevas1 < keyframesCaidaSillasNuevas.size()) {
-			FrameCaida kf = keyframesCaidaSillasNuevas[frameSillasNuevas1];
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, kf.posicion);
-			model = glm::scale(model, glm::vec3(kf.escala));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			sillasLN.Draw(lightingShader);
-		}
-		else if (!keyframesCaidaSillasNuevas.empty()) {
-			FrameCaida kfFinal = keyframesCaidaSillasNuevas.back();
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, kfFinal.posicion);
-			model = glm::scale(model, glm::vec3(kfFinal.escala));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			sillasLN.Draw(lightingShader);
-		}
+		//if (animarSillasNuevas1 && frameSillasNuevas1 < keyframesCaidaSillasNuevas.size()) {
+		//	FrameCaida kf = keyframesCaidaSillasNuevas[frameSillasNuevas1];
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, kf.posicion);
+		//	model = glm::scale(model, glm::vec3(kf.escala));
+		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//	sillasLN.Draw(lightingShader);
+		//}
+		//else if (!keyframesCaidaSillasNuevas.empty()) {
+		//	FrameCaida kfFinal = keyframesCaidaSillasNuevas.back();
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, kfFinal.posicion);
+		//	model = glm::scale(model, glm::vec3(kfFinal.escala));
+		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//	sillasLN.Draw(lightingShader);
+		//}
 
-		// === SILLAS NUEVAS 2 ===
-		if (animarSillasNuevas2 && frameSillasNuevas2 < keyframesCaidaSillasNuevas.size()) {
-			FrameCaida kf = keyframesCaidaSillasNuevas[frameSillasNuevas2];
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, kf.posicion);
-			model = glm::scale(model, glm::vec3(kf.escala));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			sillasLN2.Draw(lightingShader);
-		}
-		else if (!keyframesCaidaSillasNuevas.empty()) {
-			FrameCaida kfFinal = keyframesCaidaSillasNuevas.back();
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, kfFinal.posicion);
-			model = glm::scale(model, glm::vec3(kfFinal.escala));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			sillasLN2.Draw(lightingShader);
-		}
+		//// === SILLAS NUEVAS 2 ===
+		//if (animarSillasNuevas2 && frameSillasNuevas2 < keyframesCaidaSillasNuevas.size()) {
+		//	FrameCaida kf = keyframesCaidaSillasNuevas[frameSillasNuevas2];
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, kf.posicion);
+		//	model = glm::scale(model, glm::vec3(kf.escala));
+		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//	sillasLN2.Draw(lightingShader);
+		//}
+		//else if (!keyframesCaidaSillasNuevas.empty()) {
+		//	FrameCaida kfFinal = keyframesCaidaSillasNuevas.back();
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, kfFinal.posicion);
+		//	model = glm::scale(model, glm::vec3(kfFinal.escala));
+		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//	sillasLN2.Draw(lightingShader);
+		//}
 
-		// === SILLAS NUEVAS 3 ===
-		if (animarSillasNuevas3 && frameSillasNuevas3 < keyframesCaidaSillasNuevas.size()) {
-			FrameCaida kf = keyframesCaidaSillasNuevas[frameSillasNuevas3];
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, kf.posicion);
-			model = glm::scale(model, glm::vec3(kf.escala));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			sillasLN3.Draw(lightingShader);
-		}
-		else if (!keyframesCaidaSillasNuevas.empty()) {
-			FrameCaida kfFinal = keyframesCaidaSillasNuevas.back();
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, kfFinal.posicion);
-			model = glm::scale(model, glm::vec3(kfFinal.escala));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			sillasLN3.Draw(lightingShader);
-		}
+		//// === SILLAS NUEVAS 3 ===
+		//if (animarSillasNuevas3 && frameSillasNuevas3 < keyframesCaidaSillasNuevas.size()) {
+		//	FrameCaida kf = keyframesCaidaSillasNuevas[frameSillasNuevas3];
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, kf.posicion);
+		//	model = glm::scale(model, glm::vec3(kf.escala));
+		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//	sillasLN3.Draw(lightingShader);
+		//}
+		//else if (!keyframesCaidaSillasNuevas.empty()) {
+		//	FrameCaida kfFinal = keyframesCaidaSillasNuevas.back();
+		//	model = glm::mat4(1.0f);
+		//	model = glm::translate(model, kfFinal.posicion);
+		//	model = glm::scale(model, glm::vec3(kfFinal.escala));
+		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//	sillasLN3.Draw(lightingShader);
+		//}
 
-		// === GABINETES ===
+		//// === GABINETES ===
 
-		for (int i = 0; i < 12; ++i) {
-			if (animarGabinetes[i] && frameGabinetes[i] < keyframesGabinetes[i].size()) {
-				FrameCaida kf = keyframesGabinetes[i][frameGabinetes[i]];
-				model = glm::mat4(1.0f);
-				model = glm::translate(model, kf.posicion);
-				model = glm::scale(model, glm::vec3(kf.escala));
-				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-				gabinetesLN[i]->Draw(lightingShader);
-			}
-			else if ((animarGabinetes[i] || frameGabinetes[0] >= desfaseGabinetes[i]) && !keyframesGabinetes[i].empty()) {
-				FrameCaida kfFinal = keyframesGabinetes[i].back();
-				model = glm::mat4(1.0f);
-				model = glm::translate(model, kfFinal.posicion);
-				model = glm::scale(model, glm::vec3(kfFinal.escala));
-				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-				gabinetesLN[i]->Draw(lightingShader);
-			}
-		}
+		//for (int i = 0; i < 12; ++i) {
+		//	if (animarGabinetes[i] && frameGabinetes[i] < keyframesGabinetes[i].size()) {
+		//		FrameCaida kf = keyframesGabinetes[i][frameGabinetes[i]];
+		//		model = glm::mat4(1.0f);
+		//		model = glm::translate(model, kf.posicion);
+		//		model = glm::scale(model, glm::vec3(kf.escala));
+		//		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//		gabinetesLN[i]->Draw(lightingShader);
+		//	}
+		//	else if ((animarGabinetes[i] || frameGabinetes[0] >= desfaseGabinetes[i]) && !keyframesGabinetes[i].empty()) {
+		//		FrameCaida kfFinal = keyframesGabinetes[i].back();
+		//		model = glm::mat4(1.0f);
+		//		model = glm::translate(model, kfFinal.posicion);
+		//		model = glm::scale(model, glm::vec3(kfFinal.escala));
+		//		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//		gabinetesLN[i]->Draw(lightingShader);
+		//	}
+		//}
+
+		// Body
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, StuPos);
+		model = glm::scale(model, glm::vec3(8.0f));  // REDUCIR la escala (antes estaba en 18.0f)
+		model = glm::rotate(model, glm::radians(StuRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelTemp = model;
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		StuBody.Draw(lightingShader);
+
+		// Front Left Leg
+		model = modelTemp;
+		model = glm::rotate(model, glm::radians(FLegs), glm::vec3(0.0f, 0.0f, -1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		F_LeftLeg.Draw(lightingShader);
+
+		// Front Right Leg
+		model = modelTemp;
+		model = glm::rotate(model, glm::radians(FLegs), glm::vec3(0.0f, 0.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		F_RightLeg.Draw(lightingShader);
 
 		glBindVertexArray(0);
 		// Also draw the lamp object, again binding the appropriate shader
@@ -1206,6 +1251,7 @@ int main()
 // Moves/alters the camera positions based on user input
 void DoMovement()
 {
+
 	if (recorridoActivo) return;
 
 	// Camera controls
@@ -1235,7 +1281,6 @@ void DoMovement()
 
 
 	}
-
 	if (keys[GLFW_KEY_T])
 	{
 		pointLightPositions[0].x += 0.01f;
@@ -1262,11 +1307,29 @@ void DoMovement()
 	{
 		pointLightPositions[0].z += 0.01f;
 	}
+	
 }
 
 // Is called whenever a key is pressed/released via GLFW
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
+	if (GLFW_KEY_ESCAPE == key && GLFW_PRESS == action)
+	{
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+
+	if (key >= 0 && key < 1024)
+	{
+		if (action == GLFW_PRESS)
+		{
+			keys[key] = true;
+		}
+		else if (action == GLFW_RELEASE)
+		{
+			keys[key] = false;
+		}
+	}
+
 	if (GLFW_KEY_ESCAPE == key && GLFW_PRESS == action)
 	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
@@ -1365,8 +1428,185 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		// Activa el primero de inmediato
 		animarGabinetes[0] = true;
 	}
+	if (action == GLFW_PRESS) {
+		switch (key) {
+		case GLFW_KEY_1:
+			moveForward = !moveForward;  // Alternar avance
+			turnRight = false;
+			turnLeft = false;
+			turn180 = false;
+			moveBackward = false;
+			break;
 
+		case GLFW_KEY_2:
+			if (turnRight) {
+				turnRight = false;  // Detener si ya estaba girando
+			}
+			else {
+				moveForward = false;
+				moveBackward = false;
+				turnRight = true;
+				turnLeft = false;
+				turn180 = false;
+				targetRotation = fmod(StuRot + 90.0f, 360.0f);
+				if (targetRotation < 0.0f) targetRotation += 360.0f;
+			}
+			break;
+
+		case GLFW_KEY_3:
+			if (turnLeft) {
+				turnLeft = false;
+			}
+			else {
+				moveForward = false;
+				moveBackward = false;
+				turnRight = false;
+				turnLeft = true;
+				turn180 = false;
+				targetRotation = fmod(StuRot - 90.0f, 360.0f);
+				if (targetRotation < 0.0f) targetRotation += 360.0f;
+			}
+			break;
+
+		case GLFW_KEY_4:
+			if (turn180) {
+				turn180 = false;
+			}
+			else {
+				moveForward = false;
+				moveBackward = false;
+				turnRight = false;
+				turnLeft = false;
+				turn180 = true;
+				targetRotation = fmod(StuRot + 180.0f, 360.0f);
+				if (targetRotation < 0.0f) targetRotation += 360.0f;
+			}
+			break;
+
+		case GLFW_KEY_5:
+			moveBackward = !moveBackward;  // Alternar retroceso
+			moveForward = false;
+			turnRight = false;
+			turnLeft = false;
+			turn180 = false;
+			break;
+		}
+	}
 }
+
+
+void Animation() {
+	float speed = 0.02f;
+	float rotSpeed = 2.0f;
+
+	// Función lambda para diferencia angular (-180 a 180)
+	auto angleDiff = [](float a, float b) {
+		float diff = fmod((a - b + 540.0f), 360.0f) - 180.0f;
+		return diff;
+		};
+
+	// Animación de las piernas al caminar
+	if (moveForward) {
+		if (!step) {
+			RLegs += 0.3f;
+			FLegs += 0.3f;
+			if (RLegs > 13.0f)
+				step = true;
+		}
+		else {
+			RLegs -= 0.3f;
+			FLegs -= 0.3f;
+			if (RLegs < -13.0f)
+				step = false;
+		}
+
+		// Dirección según rotación
+		float radians = glm::radians(StuRot);
+		float dirX = cos(radians);   // antes era sin
+		float dirZ = -sin(radians);  // antes era cos
+
+		StuPos.x += dirX * speed;
+		StuPos.z += dirZ * speed;
+
+	}
+
+	// Girar 90° derecha
+	if (turnRight) {
+		float diff = angleDiff(targetRotation, StuRot);
+		if (abs(diff) > 1.0f) {
+			StuRot += (diff > 0 ? rotSpeed : -rotSpeed);
+			RLegs = sin(glfwGetTime() * 5.0f) * 3.0f;
+			FLegs = sin(glfwGetTime() * 5.0f) * 3.0f;
+		}
+		else {
+			turnRight = false;
+			StuRot = targetRotation;
+			RLegs = 0.0f;
+			FLegs = 0.0f;
+		}
+	}
+
+	// Girar 90° izquierda
+	if (turnLeft) {
+		float diff = angleDiff(targetRotation, StuRot);
+		if (abs(diff) > 1.0f) {
+			StuRot += (diff > 0 ? rotSpeed : -rotSpeed);
+			RLegs = sin(glfwGetTime() * 5.0f) * 3.0f;
+			FLegs = sin(glfwGetTime() * 5.0f) * 3.0f;
+		}
+		else {
+			turnLeft = false;
+			StuRot = targetRotation;
+			RLegs = 0.0f;
+			FLegs = 0.0f;
+		}
+	}
+
+	// Girar 180°
+	if (turn180) {
+		float diff = angleDiff(targetRotation, StuRot);
+		if (abs(diff) > 1.0f) {
+			StuRot += (diff > 0 ? rotSpeed : -rotSpeed);
+			RLegs = sin(glfwGetTime() * 5.0f) * 3.0f;
+			FLegs = sin(glfwGetTime() * 5.0f) * 3.0f;
+		}
+		else {
+			turn180 = false;
+			StuRot = targetRotation;
+			RLegs = 0.0f;
+			FLegs = 0.0f;
+		}
+	}
+
+	// Animación al caminar hacia atrás
+	if (moveBackward) {
+		if (!step) {
+			RLegs += 0.3f;
+			FLegs += 0.3f;
+			if (RLegs > 13.0f)
+				step = true;
+		}
+		else {
+			RLegs -= 0.3f;
+			FLegs -= 0.3f;
+			if (RLegs < -13.0f)
+				step = false;
+		}
+
+		// Dirección opuesta al frente
+		float radians = glm::radians(StuRot);
+		float dirX = cos(radians);
+		float dirZ = -sin(radians);
+
+		StuPos.x -= dirX * speed;
+		StuPos.z -= dirZ * speed;
+	}
+
+	// Normalizar StuRot
+	if (StuRot >= 360.0f) StuRot -= 360.0f;
+	if (StuRot < 0.0f) StuRot += 360.0f;
+}
+
 
 void MouseCallback(GLFWwindow* window, double xPos, double yPos)
 {
